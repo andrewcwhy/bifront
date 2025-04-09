@@ -1,4 +1,9 @@
 {
-    
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "target": "ESNext",
+        "jsx": "react-jsx",
+        "strict": true,
+    },
     "exclude": ["node_modules, dist, public"]
 }
