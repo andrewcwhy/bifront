@@ -1,0 +1,34 @@
+{
+  "name": "bifront",
+  "version": "1.0.0",
+  "description": "A live browser editor dev server",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "live-editor",
+    "live-preview",
+    "editing",
+    "browser-editor"
+  ],
+  "author": "Andrew Christian Young",
+  "license": "MIT",
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.9",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.2",
+    "bun-plugin-tailwind": "^0.0.15",
+    "tailwindcss": "^4.1.3",
+    "typescript": "^5.8.3"
+  }
+}
