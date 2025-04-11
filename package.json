@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "A live browser editor dev server",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bifront": "bifront editor",
+    "build": ""
   },
   "keywords": [
     "live-editor",
@@ -13,6 +14,9 @@
   ],
   "author": "Andrew Christian Young",
   "license": "MIT",
+  "bin": {
+    "bifront": "./dist/bin/cli.js"
+  },
   "dependencies": {
     "@mdx-js/mdx": "^3.1.0",
     "clsx": "^2.1.1",

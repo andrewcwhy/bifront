@@ -4,6 +4,8 @@
         "target": "ESNext",
         "jsx": "react-jsx",
         "strict": true,
+        "outDir": "./dist",
+        "declaration": true,
     },
     "exclude": ["node_modules, dist, public"]
 }
