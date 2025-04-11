@@ -1,11 +1,10 @@
 {
+    "extends": "./tsconfig.base.json",
     "compilerOptions": {
-        "skipLibCheck": true,
-        "target": "ESNext",
-        "jsx": "react-jsx",
-        "strict": true,
-        "outDir": "./dist",
-        "declaration": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
     },
-    "exclude": ["node_modules, dist, public"]
+    "include": ["bin", "src", "scripts/dev.ts"]
 }
