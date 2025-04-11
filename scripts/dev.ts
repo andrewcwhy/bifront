@@ -1,4 +1,4 @@
-import { serve } from 'bun'
+import http from 'http'
 import {
     stat,
     readdir,
@@ -10,61 +10,61 @@ import {
     readFile,
 } from 'node:fs/promises'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
-// Constants
-const ROOT_DIR: string = process.cwd()
-const PUBLIC_DIR: string = path.join(import.meta.dir, '../dist')
-const PORT: number = 3001
+// ESM-style __dirname workaround
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-serve({
-    port: PORT,
-    async fetch(req) {
-        const url = new URL(req.url)
-        const pathname = decodeURIComponent(url.pathname)
-        const queryPath = decodeURIComponent(url.searchParams.get('path') || '')
-        const fullPath = path.join(ROOT_DIR, queryPath)
+const ROOT_DIR = process.cwd()
+const PUBLIC_DIR = path.join(__dirname, '../dist')
+const PORT = 3001
 
-        // 📁 File API
-        if (pathname.startsWith('/api/files')) {
-            try {
-                // Read file or directory
-                if (req.method === 'GET') {
-                    const fileStat = await stat(fullPath)
+const server = http.createServer(async (req, res) => {
+    const url = new URL(req.url || '/', `http://${req.headers.host}`)
+    const pathname = decodeURIComponent(url.pathname)
+    const queryPath = decodeURIComponent(url.searchParams.get('path') || '')
+    const fullPath = path.join(ROOT_DIR, queryPath)
 
-                    if (fileStat.isDirectory()) {
-                        const entries = await readdir(fullPath, {
-                            withFileTypes: true,
-                        })
-                        const files = entries.map((entry) => ({
-                            name: entry.name,
-                            type: entry.isDirectory() ? 'directory' : 'file',
-                        }))
-                        return Response.json({ files })
-                    } else {
-                        const content = await readFile(fullPath, 'utf8')
-                        return Response.json({ content })
-                    }
+    if (pathname.startsWith('/api/files')) {
+        try {
+            if (req.method === 'GET') {
+                const fileStat = await stat(fullPath)
+                if (fileStat.isDirectory()) {
+                    const entries = await readdir(fullPath, { withFileTypes: true })
+                    const files = entries.map((entry) => ({
+                        name: entry.name,
+                        type: entry.isDirectory() ? 'directory' : 'file',
+                    }))
+                    return sendJson(res, 200, { files })
+                } else {
+                    const content = await readFile(fullPath, 'utf8')
+                    return sendJson(res, 200, { content })
                 }
+            }
 
-                // Save file contents
+            let body = ''
+            req.on('data', chunk => { body += chunk })
+            req.on('end', async () => {
+                let json: any = {}
+                try {
+                    json = JSON.parse(body)
+                } catch {}
+
                 if (req.method === 'POST') {
-                    const { content } = await req.json()
-                    await writeFile(fullPath, content || '', 'utf8')
-                    return new Response('Saved')
+                    await writeFile(fullPath, json.content || '', 'utf8')
+                    return res.end('Saved')
                 }
 
-                // Create file or folder
                 if (req.method === 'PUT') {
-                    const body = await req.json().catch(() => ({}))
-                    if (body.isDirectory) {
+                    if (json.isDirectory) {
                         await mkdir(fullPath, { recursive: true })
                     } else {
                         await writeFile(fullPath, '', 'utf8')
                     }
-                    return new Response('Created')
+                    return res.end('Created')
                 }
 
-                // Delete file or folder
                 if (req.method === 'DELETE') {
                     const fileStat = await stat(fullPath)
                     if (fileStat.isDirectory()) {
@@ -72,58 +72,58 @@ serve({
                     } else {
                         await unlink(fullPath)
                     }
-                    return new Response('Deleted')
+                    return res.end('Deleted')
                 }
 
-                // Rename file or folder
                 if (req.method === 'PATCH') {
-                    const { newPath } = await req.json()
-                    const newFullPath = path.join(ROOT_DIR, newPath)
+                    const newFullPath = path.join(ROOT_DIR, json.newPath)
                     await rename(fullPath, newFullPath)
-                    return new Response('Renamed')
+                    return res.end('Renamed')
                 }
-            } catch (err) {
-                console.error('❌ File API error:', err)
-                return new Response('File operation failed', { status: 500 })
-            }
+            })
+
+            return
+        } catch (err) {
+            console.error('❌ File API error:', err)
+            res.writeHead(500)
+            return res.end('File operation failed')
         }
+    }
 
-        // Static file serving
-        const filePath = path.join(
-            PUBLIC_DIR,
-            pathname === '/' ? 'index.html' : pathname
-        )
-        const file = Bun.file(filePath)
+    const filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname)
 
-        if (await file.exists()) {
-            const ext = path.extname(filePath)
-            const contentType = getContentType(ext)
-            return new Response(
-                file,
-                contentType
-                    ? { headers: { 'Content-Type': contentType } }
-                    : undefined
-            )
+    try {
+        const fileBuffer = await readFile(filePath)
+        const ext = path.extname(filePath)
+        const contentType = getContentType(ext)
+        res.writeHead(200, { 'Content-Type': contentType || 'application/octet-stream' })
+        return res.end(fileBuffer)
+    } catch {
+        try {
+            const fallback = await readFile(path.join(PUBLIC_DIR, 'index.html'))
+            res.writeHead(200, { 'Content-Type': 'text/html' })
+            res.end(fallback)
+        } catch {
+            res.writeHead(404)
+            res.end('Not Found')
         }
-
-        // Fallback to SPA routing (React)
-        const fallback = Bun.file(path.join(PUBLIC_DIR, 'index.html'))
-        return new Response(fallback, {
-            headers: { 'Content-Type': 'text/html' },
-        })
-    },
+    }
 })
 
-// Graceful shutdown
+server.listen(PORT, () => {
+    console.log(`Janudocs Editor running at http://localhost:${PORT}`)
+})
+
 process.on('SIGINT', () => {
     console.log('\nJanudocs Editor stopped by user.')
     process.exit(0)
 })
 
-// Log server start
-console.log(`Janudocs Editor running at http://localhost:${PORT}`)
+function sendJson(res: http.ServerResponse, status: number, data: any) {
+    res.writeHead(status, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify(data))
+}
 
-// Helper function to get content type based on file extension
 function getContentType(ext: string): string | undefined {
     return {
         '.js': 'application/javascript',
