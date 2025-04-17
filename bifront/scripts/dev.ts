@@ -31,7 +31,9 @@ const server = http.createServer(async (req, res) => {
             if (req.method === 'GET') {
                 const fileStat = await stat(fullPath)
                 if (fileStat.isDirectory()) {
-                    const entries = await readdir(fullPath, { withFileTypes: true })
+                    const entries = await readdir(fullPath, {
+                        withFileTypes: true,
+                    })
                     const files = entries.map((entry) => ({
                         name: entry.name,
                         type: entry.isDirectory() ? 'directory' : 'file',
@@ -44,7 +46,9 @@ const server = http.createServer(async (req, res) => {
             }
 
             let body = ''
-            req.on('data', chunk => { body += chunk })
+            req.on('data', (chunk) => {
+                body += chunk
+            })
             req.on('end', async () => {
                 let json: any = {}
                 try {
@@ -90,13 +94,18 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
-    const filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname)
+    const filePath = path.join(
+        PUBLIC_DIR,
+        pathname === '/' ? 'index.html' : pathname
+    )
 
     try {
         const fileBuffer = await readFile(filePath)
         const ext = path.extname(filePath)
         const contentType = getContentType(ext)
-        res.writeHead(200, { 'Content-Type': contentType || 'application/octet-stream' })
+        res.writeHead(200, {
+            'Content-Type': contentType || 'application/octet-stream',
+        })
         return res.end(fileBuffer)
     } catch {
         try {
