@@ -1,48 +1,48 @@
 {
-    "name": "bifront",
-    "version": "1.0.0",
-    "description": "A live browser editor dev server",
-    "keywords": [
-        "live-editor",
-        "live-preview",
-        "editing",
-        "browser-editor"
-    ],
-    "author": "Andrew Christian Young",
-    "license": "MIT",
-    "bin": {
-        "bifront": "./bin/index.js"
-    },
-    "scripts": {
-        "build": "bun run scripts/build.ts",
-        "format": "prettier --write .",
-        "editor": "bun --hot scripts/dev.ts"
-    },
-    "bugs": {
-        "url": "https://github.com/andrewcwhy/bifront/issues"
-    },
-    "homepage": "https://github.com/andrewcwhy/bifront#readme",
-    "types": "module",
-    "dependencies": {
-        "@mdx-js/mdx": "^3.1.0",
-        "@tailwindcss/vite": "^4.1.4",
-        "@tanstack/react-router": "^1.116.0",
-        "clsx": "^2.1.1",
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0",
-        "react-icons": "^5.5.0",
-        "react-markdown": "^10.1.0",
-        "react-syntax-highlighter": "^15.6.1",
-        "rehype-raw": "^7.0.0",
-        "remark-gfm": "^4.0.1",
-        "tailwindcss": "^4.1.4"
-    },
-    "devDependencies": {
-        "@tanstack/router-plugin": "^1.116.1",
-        "@types/react": "^19.1.1",
-        "@types/react-dom": "^19.1.2",
-        "@vitejs/plugin-react-swc": "^3.9.0",
-        "typescript": "^5.8.3",
-        "vite": "^6.3.0"
-    }
+	"name": "bifront",
+	"version": ".0.0",
+	"description": "A live browser editor dev server",
+	"author": "Andrew Christian Young",
+	"type": "module",
+	"bin": {
+		"bifront": "./bin/index.js"
+	},
+	"bugs": {
+		"url": "https://github.com/andrewcwhy/bifront/issues"
+	},
+	"files": ["bin", "dist"],
+	"keywords": ["live-editor", "live-preview", "editing", "browser-editor"],
+	"homepage": "https://github.com/andrewcwhy/bifront#readme",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "vite build && tsc",
+		"editor": "bun --hot scripts/dev.ts"
+	},
+	"dependencies": {
+		"@mdx-js/mdx": "^3.1.0",
+		"@mdx-js/rollup": "^3.1.0",
+		"@tailwindcss/vite": "^4.1.4",
+		"@tanstack/react-router": "^1.116.0",
+		"clsx": "^2.1.1",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
+		"react-icons": "^5.5.0",
+		"react-markdown": "^10.1.0",
+		"react-syntax-highlighter": "^15.6.1",
+		"rehype-raw": "^7.0.0",
+		"remark-gfm": "^4.0.1",
+		"tailwindcss": "^4.1.4"
+	},
+	"devDependencies": {
+		"@tanstack/router-plugin": "^1.116.1",
+		"@types/react": "^19.1.2",
+		"@types/react-dom": "^19.1.2",
+		"@vitejs/plugin-react-swc": "^3.9.0",
+		"lightningcss": "^1.29.3",
+		"typescript": "^5.8.3",
+		"vite": "^6.3.3"
+	}
 }

@@ -1,15 +1,13 @@
 {
-    "name": "bifront-monorepo",
-    "description": "A monorepo for Bifront",
-    "workspaces": [
-        "bifront/*"
-    ],
-    "scripts": {
-        "editor": "",
-        "format": "prettier --write ."
-    },
-    "devDependencies": {
-        "bifront": "link:bifront",
-        "prettier": "^3.5.3"
-    }
+	"name": "bifront-monorepo",
+	"description": "A monorepo for Bifront",
+	"scripts": {
+		"check": "bunx biome check --write .",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint --write ."
+	},
+	"workspaces": ["bifront/*"],
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4"
+	}
 }

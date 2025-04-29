@@ -1,6 +1,3 @@
 export default function Footer() {
-    return (
-        <footer className="w-full">
-        </footer>
-    )
+	return <footer className="w-full">Footer</footer>;
 }
